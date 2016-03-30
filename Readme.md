@@ -1,3 +1,3 @@
-# Metalsmith Blocs-list Plugin
+# Metalsmith Blocks List Plugin
 
-Organise blocks trought list and contat all blocks to build page.
+Organise blocks through list and concat all blocks to build page.
