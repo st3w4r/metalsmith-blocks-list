@@ -1,9 +1,9 @@
 'use strict'
 
+var debug = require('debug')('metalsmith-blocks-list');
 var fs = require('fs');
 var path = require('path');
 var async = require('async');
-
 /**
  * Expose `Plugin`
  */
@@ -34,8 +34,10 @@ function plugin(opts) {
 		function filterFile(file) {
 			var correctExtansion = path.extname(file) === opts.extList;
 			var hasblocks = files[file].blocks;
-			if (correctExtansion && hasblocks)
+			if (correctExtansion && hasblocks) {
+				debug('filtred list file: %s', file);
 				return true;
+			}
 			return false;
 		}
 
@@ -47,6 +49,7 @@ function plugin(opts) {
 				if (path.extname(file) === opts.extList) {
 					var save = files[file];
 					files[path.parse(file).name] = save;
+					debug('change file extension: %s', path.parse(file).name);
 					delete files[file];
 				}
 			})
@@ -55,14 +58,16 @@ function plugin(opts) {
 		/**
 		 * Select just files with right extension
 		 */
-		var listFiles = Object.keys(files);
-		var filtredListFiles = listFiles.filter(filterFile);
+		var filtredListFiles = Object.keys(files).filter(filterFile);
 
 		/**
 		 * Process each list files
 		 */
 		async.each(filtredListFiles, (item, callback) => {
-			var blocksPath = files[item].blocks.map((item) =>{
+			/**
+			 * Get all blocs file path
+			 */
+			var blocksPath = files[item].blocks.map((item) => {
 				return path.join(metalsmith.path(opts.directoryblocks), item);
 			});
 
@@ -73,21 +78,19 @@ function plugin(opts) {
 			var arrBuffers = [];
 			var bufferTotalLength = 0;
 
-			async.each(blocksPath, (filePath, callback) => {
-				console.log(filePath);
+			blocksPath.forEach((filePath) => {
+				debug('concat file: %s', filePath);
 				var data = fs.readFileSync(filePath);
 				bufferTotalLength += data.length;
 				arrBuffers.push(data);
-				callback();
-			}, (err, done) => {
-				if (err) console.log('Error Buffer: ', err);
-				buffer = Buffer.concat(arrBuffers, bufferTotalLength);
-				files[item].contents = buffer;
-				callback();
 			});
 
+			buffer = Buffer.concat(arrBuffers, bufferTotalLength);
+			files[item].contents = buffer;
+			callback();
+
 		}, (err, callback) => {
-			if (err) console.log('Error: ', err);
+			if (err) throw err;
 			/**
 			 * Change filename extension
 			 */
