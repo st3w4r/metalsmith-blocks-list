@@ -56,24 +56,19 @@ function plugin(opts) {
 		}
 
 		/**
-		 * Select just files with right extension
-		 */
-		var filtredListFiles = Object.keys(files).filter(filterFile);
-
-		/**
-		 * Process each list files
-		 */
-		async.each(filtredListFiles, (item, callback) => {
+		* Concat all bocks files and create a buffer
+		*/
+		function concatAllBlocks(item, callback) {
 			/**
-			 * Get all blocs file path
-			 */
+			* Get all blocs file path
+			*/
 			var blocksPath = files[item].blocks.map((item) => {
 				return path.join(metalsmith.path(opts.directoryblocks), item);
 			});
 
 			/**
-			 * Concat all bocks files and create a buffer
-			 */
+			* Concat all bocks files and create a buffer
+			*/
 			var buffer;
 			var arrBuffers = [];
 			var bufferTotalLength = 0;
@@ -88,8 +83,17 @@ function plugin(opts) {
 			buffer = Buffer.concat(arrBuffers, bufferTotalLength);
 			files[item].contents = buffer;
 			callback();
+		}
 
-		}, (err, callback) => {
+		/**
+		* Select just files with right extension
+		*/
+		var filtredListFiles = Object.keys(files).filter(filterFile);
+
+		/**
+		 * Process each list files
+		 */
+		async.each(filtredListFiles, concatAllBlocks, (err, callback) => {
 			if (err) throw err;
 			/**
 			 * Change filename extension
