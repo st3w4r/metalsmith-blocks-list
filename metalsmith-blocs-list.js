@@ -21,17 +21,28 @@ function plugin(opts) {
 
 	//Init options
 	opts = opts || {};
-	opts.directory = opts.directory || 'lists';
-	opts.ext = opts.ext || '.list';
+	opts.directoryBlocs = opts.directoryBlocs || 'blocs';
+	opts.extList = opts.extList || '.list';
+	opts.extOut = opts.extOut || '.html';
 
 	return function(files, metalsmith, done){
 
 		function filterFile(file) {
-			var correctExtansion = path.extname(file) === opts.ext;
+			var correctExtansion = path.extname(file) === opts.extList;
 			var hasBlocs = files[file].blocs;
 			if (correctExtansion && hasBlocs)
 				return true;
 			return false;
+		}
+
+		function changeFileExt(files) {
+			Object.keys(files).map((file) => {
+				if (path.extname(file) === opts.extList) {
+					var save = files[file];
+					files[path.parse(file).name] = save;
+					delete files[file];
+				}
+			})
 		}
 
 		var listFiles = Object.keys(files);
@@ -39,7 +50,7 @@ function plugin(opts) {
 
 		async.each(filtredListFiles, (item, callback) => {
 			var blocsPath = files[item].blocs.map((item) =>{
-				return path.join(metalsmith.path(opts.directory), item);
+				return path.join(metalsmith.path(opts.directoryBlocs), item);
 			});
 
 			var buffer;
@@ -61,11 +72,15 @@ function plugin(opts) {
 				if (err) console.log('Error Buffer: ', err);
 				buffer = Buffer.concat(arrBuffers, bufferTotalLength);
 				files[item].contents = buffer;
-				console.log(files[item]);
+				// console.log(files[item]);
 				callback();
 			});
 		}, (err, callback) => {
 			if (err) console.log('Error: ', err);
+			// Change file extension
+			changeFileExt(files);
+			console.log(files);
+
 			done();
 		});
 	};
