@@ -18,8 +18,9 @@ var async = require('async');
 */
 
 function plugin(opts) {
-
-	//Init options
+	/**
+	 * Init options
+	 */
 	opts = opts || {};
 	opts.directoryblocks = opts.directoryblocks || 'blocks';
 	opts.extList = opts.extList || '.list';
@@ -27,6 +28,9 @@ function plugin(opts) {
 
 	return function(files, metalsmith, done){
 
+		/**
+		 * Check if the file is valide to process
+		 */
 		function filterFile(file) {
 			var correctExtansion = path.extname(file) === opts.extList;
 			var hasblocks = files[file].blocks;
@@ -35,6 +39,9 @@ function plugin(opts) {
 			return false;
 		}
 
+		/**
+		 * Remove the file extension
+		 */
 		function changeFileExt(files) {
 			Object.keys(files).map((file) => {
 				if (path.extname(file) === opts.extList) {
@@ -45,25 +52,29 @@ function plugin(opts) {
 			})
 		}
 
+		/**
+		 * Select just files with right extension
+		 */
 		var listFiles = Object.keys(files);
 		var filtredListFiles = listFiles.filter(filterFile);
 
+		/**
+		 * Process each list files
+		 */
 		async.each(filtredListFiles, (item, callback) => {
 			var blocksPath = files[item].blocks.map((item) =>{
 				return path.join(metalsmith.path(opts.directoryblocks), item);
 			});
 
+			/**
+			 * Concat all bocks files and create a buffer
+			 */
 			var buffer;
 			var arrBuffers = [];
 			var bufferTotalLength = 0;
 
 			async.each(blocksPath, (filePath, callback) => {
-				// fs.readFile(filePath, (err, data) => {
-				// 	if (err) console.log('Error: ', err);
-				// 	bufferTotalLength += data.length;
-				// 	arrBuffers.push(data);
-				// 	callback();
-				// });
+				console.log(filePath);
 				var data = fs.readFileSync(filePath);
 				bufferTotalLength += data.length;
 				arrBuffers.push(data);
@@ -72,25 +83,16 @@ function plugin(opts) {
 				if (err) console.log('Error Buffer: ', err);
 				buffer = Buffer.concat(arrBuffers, bufferTotalLength);
 				files[item].contents = buffer;
-				// console.log(files[item]);
 				callback();
 			});
+
 		}, (err, callback) => {
 			if (err) console.log('Error: ', err);
-			// Change file extension
+			/**
+			 * Change filename extension
+			 */
 			changeFileExt(files);
-			console.log(files);
-
 			done();
 		});
 	};
-}
-
-// Helper
-function readblocks(blocksDir, metalsmith, done) {
-	var path = metalsmith.path(blocksDir);
-	fs.readdir(path, (err, data) => {
-		if (err) throw err;
-		done(null, data);
-	});
 }
