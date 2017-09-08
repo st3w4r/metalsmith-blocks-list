@@ -48,8 +48,8 @@ function plugin(opts) {
 			Object.keys(files).map((file) => {
 				if (path.extname(file) === opts.extList) {
 					var save = files[file];
-					files[path.parse(file).name + opts.extOut] = save;
-					debug('change file extension: %s', path.parse(file).name + opts.extOut);
+					files[path.parse(file).name] = save;
+					debug('change file extension: %s', path.parse(file).name);
 					delete files[file];
 				}
 			})
@@ -110,7 +110,7 @@ function plugin(opts) {
       /**
       * Remove html files
       */
-      removeUnusedHtmlFiles(files)
+      // removeUnusedHtmlFiles(files)
 
 			/**
 			 * Change filename extension
