@@ -1,0 +1,19 @@
+{
+  "name": "metalsmith-blocks-list",
+  "version": "0.1.0",
+  "description": "Concat files based on a list",
+  "main": "metalsmith-blocks-list.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/st3w4r/metalsmith-blocks-list.git"
+  },
+  "author": "Yanael Barbier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/st3w4r/metalsmith-blocks-list/issues"
+  },
+  "homepage": "https://github.com/st3w4r/metalsmith-blocks-list#readme"
+}
