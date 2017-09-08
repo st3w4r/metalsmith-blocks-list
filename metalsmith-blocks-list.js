@@ -48,8 +48,8 @@ function plugin(opts) {
 			Object.keys(files).map((file) => {
 				if (path.extname(file) === opts.extList) {
 					var save = files[file];
-					files[path.parse(file).name] = save;
-					debug('change file extension: %s', path.parse(file).name);
+					files[path.parse(file).name + opts.extOut] = save;
+					debug('change file extension: %s', path.parse(file).name + opts.extOut);
 					delete files[file];
 				}
 			})
