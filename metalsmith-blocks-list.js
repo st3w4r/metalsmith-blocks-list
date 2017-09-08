@@ -55,6 +55,18 @@ function plugin(opts) {
 			})
 		}
 
+    /**
+    * Remove files not in the list
+    */
+    function removeUnusedHtmlFiles(files) {
+      Object.keys(files).map((file) => {
+        if (path.extname(file) === '.html') {
+          debug('remove html file: %s', path.parse(file).name)
+          delete files[file]
+        }
+      })
+    }
+
 		/**
 		* Concat all bocks files and create a buffer
 		*/
@@ -95,6 +107,11 @@ function plugin(opts) {
 		 */
 		async.each(filtredListFiles, concatAllBlocks, (err, callback) => {
 			if (err) throw err;
+      /**
+      * Remove html files
+      */
+      removeUnusedHtmlFiles(files)
+
 			/**
 			 * Change filename extension
 			 */
